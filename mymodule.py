@@ -67,12 +67,10 @@ def blank(width,height):
 
 
 def get_aligned_images(frames,align_to,align,profile):
-    # zwraca odleglość
     aligned_frames = align.process(frames)
     aligned_depth_frame = aligned_frames.get_depth_frame()
     color_frame = aligned_frames.get_color_frame()
-
-
+    
     intr = color_frame.profile.as_video_stream_profile().intrinsics
     depth_intrin = aligned_depth_frame.profile.as_video_stream_profile().intrinsics
 
@@ -86,27 +84,24 @@ def get_aligned_images(frames,align_to,align,profile):
     with open('./intr7insics.json', 'w') as fp:
         json.dump(camera_parameters, fp)
 
-
     depth_image = np.asanyarray(aligned_depth_frame.get_data())  #
     depth_image_8bit = cv2.convertScaleAbs(depth_image, alpha=0.03)
     depth_image_3d = np.dstack((depth_image_8bit, depth_image_8bit, depth_image_8bit))
     color_image = np.asanyarray(color_frame.get_data())
 
-    # zwraca internal parameters 、 Depth parameter 、 Color picture 、 Depth map
+    #internal parameters 、 Depth parameter 、 Color picture 、 Depth map
     return intr, depth_intrin, color_image, depth_image, aligned_depth_frame
 
 def distanc3D(get_aligned_images,x,y):
     intr, depth_intrin, rgb, depth, aligned_depth_frame = get_aligned_images
-
-
-
+    
     dis = aligned_depth_frame.get_distance(x, y)
     print("dis: ", dis)
     camera_coordinate = rs.rs2_deproject_pixel_to_point(depth_intrin, [x, y],dis)
     print(camera_coordinate)
     return float(camera_coordinate[0]),float(camera_coordinate[1]),float(camera_coordinate[2])
-def findArcuo(img, markerSize=5, totalMarkers=100, draw=True):
 
+def findArcuo(img, markerSize=5, totalMarkers=100, draw=True):
     imgGray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     coeDist = np.array([-0.0580214448273182, 0.0669776722788811, 0.000140227333758958, 0.000817833177279681,
@@ -117,11 +112,9 @@ def findArcuo(img, markerSize=5, totalMarkers=100, draw=True):
 
     corners, ids, rejected = aruco.detectMarkers(imgGray, arucoDict, parameters=arucoParam, distCoeff=coeDist)
 
-    x=str(corners) # tablica, tablic wartość współrzednych poszczególynch rogów
+    x=str(corners) # array the coordinates of the corners
     z=re.findall(r'\b\d+\b',x) # string z powyższej tablicy
     results = list(map(int, z)) #konwersja do integera
-
-
 
     # print(results)
     print(ids)
